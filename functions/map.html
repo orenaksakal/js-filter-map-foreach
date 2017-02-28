@@ -2,65 +2,67 @@
 <script src="adder.js"></script>
 <script>
 
-    function filter(array, callback, obj) {
-        var callbackType = callback;
-        if (obj) {
-            callbackType = callback.bind(obj);
-        }
-        var filteredArray = [];
+function map(array,callback,obj) {
+    var callbackType = callback;
+    if(obj){
+        callbackType = callback.bind(obj);
+    }
+    var mappedArray = [];
 
-        for (var i = 0; i < array.length; i++) {
-            if(callbackType(array[i], i, array)) {
-                filteredArray.push(array[i]);
-            }
-        }
-        return filteredArray;
+    for(var i = 0; i < array.length; i++){
+        mappedArray.push(callbackType(array[i],i,array));
 
-    };
+    }
+    return mappedArray;
 
+}
     tests({
         'It should run callback function array.length times': function () {
             var counter = 0;
-            filter([1, 2, 3], function () {
+            map([1, 2, 3], function () {
                 counter++;
             });
             eq(counter, 3);
         },
         'It should pass in the first position as the first argument to the callback function': function () {
-            filter([1], function (number) {
+            map([1], function (number) {
                 eq(number, 1);
             });
         },
         'It should pass in the position i as the second argument to the callback function': function () {
-            filter([1], function (number, index) {
+            map([1], function (number, index) {
                 eq(index, 0);
             });
         },
         'It should pass original array as the third argument to the callback function': function () {
             var testArray = [1, 2, 3];
-            filter(testArray, function (number, index, originalArray) {
+            map(testArray, function (number, index, originalArray) {
                 eq(originalArray, testArray);
             });
         },
         'It should be able to accept this object': function () {
-            filter([1], function () {
+            map([1], function () {
                 eq(this.desc, 'that')
             }, {desc: 'that'});
         },
-        'It should filter the array': function () {
-            var testArray = [];
-            var filteredArray = filter(testArray, function () {
-            });
-            eq(testArray !== filteredArray, true);
 
+        'It should return an array': function () {
+            var mappedArray = map([], function () {});
+            eq(Array.isArray(mappedArray), true);
         },
-        'It should filter thru and return a new array': function () {
 
-            var filteredArray = filter([1,2], function (num) {
-                return num > 1;
-            });
-            eq(filteredArray.length,1);
-            eq(filteredArray[0], 2);
-        }
+        'It should return a new array not original array': function () {
+            var originalArray = [];
+            var mappedArray = map(originalArray, function () {});
+            eq(mappedArray !== originalArray, true );
+        },
+
+        'It should return a mapped  array': function () {
+           var mappedArray = map([1], function (num) {
+               return num + 2;
+
+           });
+           eq(mappedArray,3);
+        },
     });
 </script>
